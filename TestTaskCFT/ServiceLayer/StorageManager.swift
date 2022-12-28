@@ -7,15 +7,21 @@
 
 import Foundation
 
-class StorageManager {
+final class StorageManager {
+
+    // MARK: - Static Properties
     static let shared = StorageManager()
 
     private let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     private let archiveURL: URL
 
+    // MARK: - Initializers
+
     init() {
         archiveURL = documentDirectory.appendingPathComponent("Notes").appendingPathExtension("plist")
     }
+
+    // MARK: - Public Methods
 
     func saveToFile(with note: Note) {
         var notes = fetchFromFile()

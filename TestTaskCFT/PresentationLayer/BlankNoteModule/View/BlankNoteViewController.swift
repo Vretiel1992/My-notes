@@ -9,9 +9,10 @@ import UIKit
 
 protocol BlankNoteViewProtocol: AnyObject {
     func loadNote(note: Note?)
+    func showAlert()
 }
 
-class BlankNoteViewController: UIViewController {
+final class BlankNoteViewController: UIViewController {
 
     // MARK: - Public Properties
 
@@ -236,5 +237,13 @@ extension BlankNoteViewController: BlankNoteViewProtocol {
             titleTextView.text = receivedNote.title
             descriptionTextView.text = receivedNote.subtitle
         }
+    }
+
+    func showAlert() {
+        let alert = UIAlertController(title: "Не заполнены пустые поля",
+                                      message: nil,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .cancel))
+        present(alert, animated: true, completion: nil)
     }
 }

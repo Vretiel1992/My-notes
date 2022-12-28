@@ -13,7 +13,7 @@ protocol MainViewProtocol: AnyObject {
     func noteDeletion(indexPath: IndexPath)
 }
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
 
     // MARK: - Public Properties
 
