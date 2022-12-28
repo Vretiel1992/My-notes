@@ -53,13 +53,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E438BB1E2958C69D00B74EE6 /* NewNoteModule */ = {
+		E438BB1E2958C69D00B74EE6 /* BlankNoteModule */ = {
 			isa = PBXGroup;
 			children = (
 				E438BB282959D60000B74EE6 /* View */,
 				E438BB292959D60700B74EE6 /* Presenter */,
 			);
-			path = NewNoteModule;
+			path = BlankNoteModule;
 			sourceTree = "<group>";
 		};
 		E438BB232958D8FE00B74EE6 /* ServiceLayer */ = {
@@ -75,7 +75,7 @@
 			children = (
 				E438BB37295A3B8900B74EE6 /* Router.swift */,
 				E4C03EFA29574A020079A901 /* MainModule */,
-				E438BB1E2958C69D00B74EE6 /* NewNoteModule */,
+				E438BB1E2958C69D00B74EE6 /* BlankNoteModule */,
 			);
 			path = PresentationLayer;
 			sourceTree = "<group>";
