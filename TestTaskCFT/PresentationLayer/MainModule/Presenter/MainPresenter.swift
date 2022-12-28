@@ -13,7 +13,7 @@ protocol MainViewPresenterProtocol: AnyObject {
     func deleteSelected(for indexPath: IndexPath)
 }
 
-class MainPresenter: MainViewPresenterProtocol {
+final class MainPresenter: MainViewPresenterProtocol {
 
     // MARK: - Public Properties
 
