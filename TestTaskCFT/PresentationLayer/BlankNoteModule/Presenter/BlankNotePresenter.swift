@@ -9,11 +9,11 @@ import Foundation
 
 protocol BlankNoteViewPresenterProtocol: AnyObject {
     init(view: BlankNoteViewProtocol, router: RouterProtocol, note: Note?)
-    func tapComplete(title: String, subtitle: String, existingNote: Note?)
     func viewDidLoad()
+    func tapComplete(title: String, subtitle: String, existingNote: Note?)
 }
 
-class BlankNotePresenter: BlankNoteViewPresenterProtocol {
+final class BlankNotePresenter: BlankNoteViewPresenterProtocol {
     
     // MARK: - Public Properties
 
@@ -37,6 +37,16 @@ class BlankNotePresenter: BlankNoteViewPresenterProtocol {
     }
 
     func tapComplete(title: String, subtitle: String, existingNote: Note?) {
+        tap(title: title, subtitle: subtitle, existingNote: existingNote)
+    }
+
+    // MARK: - Private Methods
+
+    private func getNote() {
+        view?.loadNote(note: note)
+    }
+
+    private func tap(title: String, subtitle: String, existingNote: Note?) {
         if existingNote != nil
             && existingNote!.title == title
             && existingNote!.subtitle == subtitle {
@@ -57,24 +67,18 @@ class BlankNotePresenter: BlankNoteViewPresenterProtocol {
                 StorageManager.shared.saveToFileByIndex(with: modifiedNote, at: index)
             }
             router?.initialViewController(note: nil)
+        } else if title != "" && subtitle != "" {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
+            let currentDate = dateFormatter.string(from: Date())
+            let newNote = Note(
+                title: title,
+                subtitle: subtitle,
+                date: currentDate
+            )
+            router?.initialViewController(note: newNote)
         } else {
-            if title != "" && subtitle != "" {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
-                let currentDate = dateFormatter.string(from: Date())
-                let newNote = Note(
-                    title: title,
-                    subtitle: subtitle,
-                    date: currentDate
-                )
-                router?.initialViewController(note: newNote)
-            }
+            view?.showAlert()
         }
-    }
-
-    // MARK: - Private Methods
-
-    private func getNote() {
-        view?.loadNote(note: note)
     }
 }
