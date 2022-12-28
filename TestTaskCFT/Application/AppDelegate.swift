@@ -11,6 +11,10 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        let firstNote = Note.getFirstNote()
+        let notes = StorageManager.shared.fetchFromFile()
+        guard notes.isEmpty && !notes.contains(firstNote) else { return true }
+        StorageManager.shared.saveToFile(with: firstNote)
         return true
     }
 

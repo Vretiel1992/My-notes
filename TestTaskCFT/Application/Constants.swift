@@ -49,11 +49,14 @@ enum Constants {
 
     enum Text {
         static let titleMainVC = "Заметки"
+        static let titleEmpty = ""
+        static let backButtonTitle = "Назад"
+        static let readyNewNoteBarButtonItem = "Готово"
         static let placeholderSearchBar = "Поиск"
         static let customCell = "customCell"
         static let defaultCell = "defaultCell"
     }
-    
+
     enum Images {
         static let trashFill = UIImage(systemName: "trash.fill")
         static let addNote = UIImage(systemName: "square.and.pencil")

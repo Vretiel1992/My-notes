@@ -10,7 +10,6 @@ import UIKit
 protocol MainViewProtocol: AnyObject {
     func notesLoad(notes: [Note])
     func noteAddSuccess(note: Note)
-    func noteAddFailure(message: String)
     func noteDeletion(indexPath: IndexPath)
 }
 
@@ -30,7 +29,6 @@ class MainViewController: UIViewController {
             target: self,
             action: #selector(addTapped)
         )
-        item.tintColor = .systemOrange
         return item
     }()
 
@@ -55,6 +53,14 @@ class MainViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
+    private var filteredNotes = [Note]()
+    private var searchBarIsEmpty: Bool {
+        guard let text = searchController.searchBar.text else { return false }
+        return text.isEmpty
+    }
+    private var isFiltering: Bool {
+        return searchController.isActive && !searchBarIsEmpty
+    }
 
     // MARK: - Lifecycle
 
@@ -64,6 +70,17 @@ class MainViewController: UIViewController {
         setupNavigationBar()
         setupConstraints()
         presenter?.viewDidLoad()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = Constants.Text.titleMainVC
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationItem.title = Constants.Text.titleEmpty
     }
 
     // MARK: - Private Methods
@@ -76,6 +93,8 @@ class MainViewController: UIViewController {
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = Constants.Text.titleMainVC
+        navigationItem.backButtonTitle = Constants.Text.backButtonTitle
+        navigationController?.navigationBar.tintColor = .systemOrange
         navigationItem.searchController = searchController
         definesPresentationContext = true
         navigationItem.rightBarButtonItem = addNoteBarButtonItem
@@ -101,15 +120,7 @@ class MainViewController: UIViewController {
     // MARK: - Object Methods
 
     @objc func addTapped() {
-//        presenter?.addTapped(with: <#T##Note#>)
-    }
-}
-
-// MARK: - UISearchResultsUpdating
-
-extension MainViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        
+        presenter?.addTapped(at: nil)
     }
 }
 
@@ -117,7 +128,8 @@ extension MainViewController: UISearchResultsUpdating {
 
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        notes.count
+        if isFiltering { return filteredNotes.count }
+        return notes.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -132,7 +144,12 @@ extension MainViewController: UITableViewDataSource {
             return cell
         }
 
-        cell.configure(with: notes[indexPath.row])
+        var filterNote: Note
+        filterNote = isFiltering
+        ? filteredNotes[indexPath.row]
+        : notes[indexPath.row]
+
+        cell.configure(with: filterNote)
         return cell
     }
 }
@@ -158,6 +175,9 @@ extension MainViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+        if !isFiltering {
+            presenter?.addTapped(at: indexPath.row)
+        }
     }
 }
 
@@ -174,13 +194,24 @@ extension MainViewController: MainViewProtocol {
         tableView.reloadData()
     }
 
-    func noteAddFailure(message: String) {
-        print("Ошибку добавления объекта от презентера: \(message)")
-    }
-
     func noteDeletion(indexPath: IndexPath) {
         let index = indexPath.row
         notes.remove(at: index)
         tableView.deleteRows(at: [indexPath], with: .fade)
+    }
+}
+
+// MARK: - UISearchResultsUpdating
+
+extension MainViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text!)
+    }
+
+    private func filterContentForSearchText(_ searchText: String) {
+        filteredNotes = notes.filter({ (note: Note) -> Bool in
+            return note.title.lowercased().contains(searchText.lowercased())
+        })
+        tableView.reloadData()
     }
 }

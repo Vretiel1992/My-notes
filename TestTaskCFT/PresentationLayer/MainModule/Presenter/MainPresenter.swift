@@ -7,9 +7,9 @@
 import Foundation
 
 protocol MainViewPresenterProtocol: AnyObject {
-    init(view: MainViewProtocol)
+    init(view: MainViewProtocol, router: RouterProtocol, note: Note?)
     func viewDidLoad()
-    func addTapped(with note: Note)
+    func addTapped(at index: Int?)
     func deleteSelected(for indexPath: IndexPath)
 }
 
@@ -18,24 +18,37 @@ class MainPresenter: MainViewPresenterProtocol {
     // MARK: - Public Properties
 
     weak var view: MainViewProtocol?
+    var router: RouterProtocol?
 
     // MARK: - Private Properties
 
     private var notes: [Note] = []
-//    private var notes: Result<[Note], Error>?
+    private var note: Note?
 
     // MARK: - Protocol Methods
 
-    required init(view: MainViewProtocol) {
+    required init(view: MainViewProtocol, router: RouterProtocol, note: Note?) {
         self.view = view
+        self.router = router
+        self.note = note
     }
     
     func viewDidLoad() {
+        notes = StorageManager.shared.fetchFromFile()
         getNotes()
+        if let newNote = note {
+            addNote(note: newNote)
+        }
     }
     
-    func addTapped(with note: Note) {
-        addNote(note: note)
+    func addTapped(at index: Int?) {
+        if let currentIndex = index {
+            notes = StorageManager.shared.fetchFromFile()
+            let currentNote = notes[currentIndex]
+            router?.showBlankNewNote(note: currentNote)
+        } else {
+            router?.showBlankNewNote(note: nil)
+        }
     }
     
     func deleteSelected(for indexPath: IndexPath) {
@@ -45,21 +58,17 @@ class MainPresenter: MainViewPresenterProtocol {
     // MARK: - Private Methods
 
     private func getNotes() {
-        notes = Note.getFirstNote()
-        // когда будет БД, если будет возникать ошибка добавления объекта
-//        view?.noteAddFailure(message: error?.localizedDescription)
         view?.notesLoad(notes: notes)
     }
 
     private func addNote(note: Note) {
-        let newNote = note
-        notes.append(newNote)
-        view?.noteAddSuccess(note: newNote)
+        StorageManager.shared.saveToFile(with: note)
+        view?.noteAddSuccess(note: note)
     }
 
     private func deleteNote(at indexPath: IndexPath) {
         let index = indexPath.row
-        notes.remove(at: index)
+        StorageManager.shared.deleteFromFile(at: index)
         view?.noteDeletion(indexPath: indexPath)
     }
 }
