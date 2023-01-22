@@ -13,7 +13,7 @@ protocol RouterMain {
 }
 
 protocol RouterProtocol: RouterMain {
-    func initialViewController(note: Note?)
+    func initialViewController()
     func showBlankNewNote(note: Note?)
 }
 
@@ -31,9 +31,9 @@ class Router: RouterProtocol {
         self.assemblyBuilder = assemblyBuilder
     }
     
-    func initialViewController(note: Note?) {
+    func initialViewController() {
         if let navigationController = navigationController {
-            guard let mainViewController = assemblyBuilder?.createMainModule(router: self, note: note) else { return }
+            guard let mainViewController = assemblyBuilder?.createMainModule(router: self) else { return }
             navigationController.viewControllers = [mainViewController]
         }
     }

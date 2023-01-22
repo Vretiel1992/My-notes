@@ -8,14 +8,14 @@
 import UIKit
 
 protocol AssemblyBuilderProtocol {
-    func createMainModule(router: RouterProtocol, note: Note?) -> UIViewController
+    func createMainModule(router: RouterProtocol) -> UIViewController
     func createBlankNoteModule(router: RouterProtocol, note: Note?) -> UIViewController
 }
 
 class AssemblyBuilder: AssemblyBuilderProtocol {
-    func createMainModule(router: RouterProtocol, note: Note?) -> UIViewController {
+    func createMainModule(router: RouterProtocol) -> UIViewController {
         let view = MainViewController()
-        let presenter = MainPresenter(view: view, router: router, note: note)
+        let presenter = MainPresenter(view: view, router: router)
         view.presenter = presenter
         return view
     }

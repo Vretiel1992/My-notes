@@ -10,6 +10,7 @@ import UIKit
 protocol BlankNoteViewProtocol: AnyObject {
     func loadNote(note: Note?)
     func showAlert()
+    func hideReadyButton()
 }
 
 final class BlankNoteViewController: UIViewController {
@@ -46,7 +47,7 @@ final class BlankNoteViewController: UIViewController {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .label
-        label.text = "Заголовок"
+        label.text = Constants.Text.titleLabelBlankNoteVC
         label.textAlignment = .center
         return label
     }()
@@ -60,6 +61,7 @@ final class BlankNoteViewController: UIViewController {
         textView.isScrollEnabled = true
         textView.isEditable = true
         textView.isSelectable = true
+        textView.delegate = self
         textView.textContainer.lineBreakMode = .byTruncatingTail
         textView.showsHorizontalScrollIndicator = false
         textView.showsVerticalScrollIndicator = true
@@ -81,7 +83,7 @@ final class BlankNoteViewController: UIViewController {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .label
-        label.text = "Описание"
+        label.text = Constants.Text.descriptionLabelBlankNoteVC
         label.textAlignment = .center
         return label
     }()
@@ -95,6 +97,7 @@ final class BlankNoteViewController: UIViewController {
         textView.isScrollEnabled = true
         textView.isEditable = true
         textView.isSelectable = true
+        textView.delegate = self
         textView.dataDetectorTypes = .link
         textView.textContainer.lineBreakMode = .byTruncatingTail
         textView.showsHorizontalScrollIndicator = false
@@ -132,7 +135,6 @@ final class BlankNoteViewController: UIViewController {
 
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.rightBarButtonItem = addNewNoteBarButtonItem
     }
 
     private func subscribeToKeyboardNotification() {
@@ -193,20 +195,20 @@ final class BlankNoteViewController: UIViewController {
         titleTextView.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
         if note == nil {
-            presenter?.tapComplete(
+            presenter?.didTapCompleteButton(
                 title: titleTextView.text,
                 subtitle: descriptionTextView.text,
                 existingNote: nil
             )
         } else {
-            presenter?.tapComplete(
+            presenter?.didTapCompleteButton(
                 title: titleTextView.text,
                 subtitle: descriptionTextView.text,
                 existingNote: note
             )
         }
     }
-    
+
     @objc func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[
             UIResponder.keyboardFrameEndUserInfoKey
@@ -240,10 +242,21 @@ extension BlankNoteViewController: BlankNoteViewProtocol {
     }
 
     func showAlert() {
-        let alert = UIAlertController(title: "Не заполнены пустые поля",
+        let alert = UIAlertController(title: Constants.Text.alertTitleEmptyFields,
                                       message: nil,
                                       preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ок", style: .cancel))
+        alert.addAction(UIAlertAction(title: Constants.Text.alertOK, style: .cancel))
         present(alert, animated: true, completion: nil)
+    }
+
+    func hideReadyButton() {
+        navigationItem.setRightBarButton(nil, animated: true)
+    }
+}
+
+extension BlankNoteViewController: UITextViewDelegate {
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        navigationItem.setRightBarButton(addNewNoteBarButtonItem, animated: true)
+        return true
     }
 }

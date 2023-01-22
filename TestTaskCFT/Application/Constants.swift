@@ -50,9 +50,16 @@ enum Constants {
     enum Text {
         static let titleMainVC = "Заметки"
         static let titleEmpty = ""
+        static let titleLabelBlankNoteVC = "Заголовок"
+        static let descriptionLabelBlankNoteVC = "Описание"
         static let backButtonTitle = "Назад"
         static let readyNewNoteBarButtonItem = "Готово"
         static let placeholderSearchBar = "Поиск"
+        static let cancelButtonText = "Отменить"
+        static let keyCancelButtonText = "cancelButtonText"
+        static let alertTitleEmptyFields = "Не заполнены пустые поля"
+        static let alertOK = "Ок"
+        static let dateFormat = "dd.MM.yyyy HH:mm:ss"
         static let customCell = "customCell"
         static let defaultCell = "defaultCell"
     }
