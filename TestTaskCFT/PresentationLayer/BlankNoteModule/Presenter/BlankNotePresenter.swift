@@ -10,7 +10,7 @@ import Foundation
 protocol BlankNoteViewPresenterProtocol: AnyObject {
     init(view: BlankNoteViewProtocol, router: RouterProtocol, note: Note?)
     func viewDidLoad()
-    func tapComplete(title: String, subtitle: String, existingNote: Note?)
+    func didTapCompleteButton(title: String, subtitle: String, existingNote: Note?)
 }
 
 final class BlankNotePresenter: BlankNoteViewPresenterProtocol {
@@ -22,35 +22,36 @@ final class BlankNotePresenter: BlankNoteViewPresenterProtocol {
 
     // MARK: - Private Properties
 
-    private var note: Note?
+    private var receivedNote: Note?
+    private var createdNote: Note?
 
     // MARK: - Protocol Methods
 
     required init(view: BlankNoteViewProtocol, router: RouterProtocol, note: Note?) {
         self.view = view
         self.router = router
-        self.note = note
+        self.receivedNote = note
     }
 
     func viewDidLoad() {
         getNote()
     }
 
-    func tapComplete(title: String, subtitle: String, existingNote: Note?) {
-        tap(title: title, subtitle: subtitle, existingNote: existingNote)
+    func didTapCompleteButton(title: String, subtitle: String, existingNote: Note?) {
+        tappedCompleteButton(title: title, subtitle: subtitle, existingNote: existingNote)
     }
 
     // MARK: - Private Methods
 
     private func getNote() {
-        view?.loadNote(note: note)
+        view?.loadNote(note: receivedNote)
     }
 
-    private func tap(title: String, subtitle: String, existingNote: Note?) {
+    private func tappedCompleteButton(title: String, subtitle: String, existingNote: Note?) {
         if existingNote != nil
             && existingNote!.title == title
             && existingNote!.subtitle == subtitle {
-            router?.initialViewController(note: nil)
+            view?.hideReadyButton()
         } else if existingNote != nil
                     && title != ""
                     && subtitle != ""
@@ -66,19 +67,22 @@ final class BlankNotePresenter: BlankNoteViewPresenterProtocol {
                 StorageManager.shared.deleteFromFile(at: index)
                 StorageManager.shared.saveToFileByIndex(with: modifiedNote, at: index)
             }
-            router?.initialViewController(note: nil)
+            view?.hideReadyButton()
         } else if title != "" && subtitle != "" {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
+            dateFormatter.dateFormat = Constants.Text.dateFormat
             let currentDate = dateFormatter.string(from: Date())
             let newNote = Note(
                 title: title,
                 subtitle: subtitle,
                 date: currentDate
             )
-            router?.initialViewController(note: newNote)
+            createdNote = newNote
+            view?.hideReadyButton()
+            StorageManager.shared.saveToFile(with: newNote)
         } else {
             view?.showAlert()
+            view?.hideReadyButton()
         }
     }
 }

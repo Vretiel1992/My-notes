@@ -34,6 +34,8 @@ final class MainViewController: UIViewController {
 
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
+        searchController.isActive = true
+        searchController.searchBar.setValue(Constants.Text.cancelButtonText, forKey: Constants.Text.keyCancelButtonText)
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = Constants.Text.placeholderSearchBar
@@ -69,15 +71,15 @@ final class MainViewController: UIViewController {
         setupViews()
         setupNavigationBar()
         setupConstraints()
-        presenter?.viewDidLoad()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = Constants.Text.titleMainVC
+        presenter?.viewWillAppear()
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationItem.title = Constants.Text.titleEmpty

@@ -7,8 +7,8 @@
 import Foundation
 
 protocol MainViewPresenterProtocol: AnyObject {
-    init(view: MainViewProtocol, router: RouterProtocol, note: Note?)
-    func viewDidLoad()
+    init(view: MainViewProtocol, router: RouterProtocol)
+    func viewWillAppear()
     func addTapped(at index: Int?)
     func deleteSelected(for indexPath: IndexPath)
 }
@@ -23,22 +23,17 @@ final class MainPresenter: MainViewPresenterProtocol {
     // MARK: - Private Properties
 
     private var notes: [Note] = []
-    private var note: Note?
 
     // MARK: - Protocol Methods
 
-    required init(view: MainViewProtocol, router: RouterProtocol, note: Note?) {
+    required init(view: MainViewProtocol, router: RouterProtocol) {
         self.view = view
-        self.router = router
-        self.note = note
+        self.router = router 
     }
     
-    func viewDidLoad() {
+    func viewWillAppear() {
         notes = StorageManager.shared.fetchFromFile()
         getNotes()
-        if let newNote = note {
-            addNote(note: newNote)
-        }
     }
     
     func addTapped(at index: Int?) {
